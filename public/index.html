@@ -275,19 +275,29 @@
       </div>
       
       <!-- Song Info -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div class="bg-slate-900 rounded-lg p-3 text-center">
           <p class="text-[10px] text-slate-500 uppercase">BPM</p>
           <p id="songBpm" class="text-2xl font-bold text-amber-400">68</p>
         </div>
         <div class="bg-slate-900 rounded-lg p-3 text-center">
+          <p class="text-[10px] text-slate-500 uppercase">Capo</p>
+          <p id="songCapo" class="text-2xl font-bold text-amber-400">-</p>
+        </div>
+        <div class="bg-slate-900 rounded-lg p-3 text-center">
+          <p class="text-[10px] text-slate-500 uppercase">Key</p>
+          <p id="songKey" class="text-lg font-bold text-white">C</p>
+        </div>
+        <div class="bg-slate-900 rounded-lg p-3 text-center">
           <p class="text-[10px] text-slate-500 uppercase">דפוס פריטה</p>
-          <p id="songStrumming" class="text-lg font-mono text-white">D - D U</p>
+          <p id="songStrumming" class="text-sm font-mono text-white">D - D U</p>
         </div>
-        <div class="bg-slate-900 rounded-lg p-3 text-center col-span-2 sm:col-span-1">
-          <p class="text-[10px] text-slate-500 uppercase">אקורדים</p>
-          <div id="songChordsList" class="flex flex-wrap justify-center gap-1 mt-1"></div>
-        </div>
+      </div>
+      
+      <!-- Chords used -->
+      <div class="bg-slate-900 rounded-lg p-3">
+        <p class="text-[10px] text-slate-500 uppercase mb-2">אקורדים בשיר</p>
+        <div id="songChordsList" class="flex flex-wrap justify-center gap-1"></div>
       </div>
       
       <!-- Chord Diagrams -->
@@ -336,14 +346,17 @@
         {
           id: "song_1",
           title: "Can't Help Falling in Love",
-          artist: "Elvis Presley",
+          artist: "Elvis Presley (1961)",
           youtubeId: "vGJTaP6anOU",
           bpm: 68,
-          chords: ["C", "Em", "Am", "F", "G"],
-          strumming: "D - D U - U D U",
+          capo: 2,
+          key: "D (Capo 2 = C shapes)",
+          chords: ["C", "Em", "Am", "F", "G", "B", "A", "Dm"],
+          strumming: "Fingerpicking / Arpeggio",
           sections: [
-            { name: "Intro/Verse", progression: "C - Em - Am - F - C - G - C" },
-            { name: "Chorus", progression: "F - C - G - Am - F - C - G - C" }
+            { name: "Intro", progression: "C - G - C" },
+            { name: "Verse", progression: "C - Em - Am - F - C - G | F - G - Am - F - C - G - C" },
+            { name: "Chorus", progression: "Em - B - Em - B | Em - B | Em - A - Dm - G" }
           ]
         },
         {
@@ -506,6 +519,13 @@
       'Bm': {
         name: 'B Minor',
         frets: [2, 3, 4, 4, 2, -1],
+        fingers: [1, 2, 3, 4, 1, 0],
+        startFret: 2,
+        barre: 2
+      },
+      'B': {
+        name: 'B Major',
+        frets: [2, 4, 4, 4, 2, -1],
         fingers: [1, 2, 3, 4, 1, 0],
         startFret: 2,
         barre: 2
@@ -1201,6 +1221,8 @@
       document.getElementById("songArtist").textContent = song.artist;
       document.getElementById("youtubeEmbed").src = `https://www.youtube.com/embed/${song.youtubeId}`;
       document.getElementById("songBpm").textContent = song.bpm;
+      document.getElementById("songCapo").textContent = song.capo ? `Fret ${song.capo}` : "-";
+      document.getElementById("songKey").textContent = song.key || "-";
       document.getElementById("songStrumming").textContent = song.strumming || "D - D U";
       document.getElementById("songMetroBpm").textContent = songBpm;
       
