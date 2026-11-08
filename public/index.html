@@ -498,10 +498,10 @@
       const currentChord = playAlongChords[currentChordIndex];
       const nextChord = playAlongChords[(currentChordIndex + 1) % playAlongChords.length];
       
-      document.getElementById('currentChordDiagram').innerHTML = generateChordSVG(currentChord, 70);
+      document.getElementById('currentChordDiagram').innerHTML = generateChordSVG(currentChord, 100);
       document.getElementById('currentChordName').textContent = currentChord;
       
-      document.getElementById('nextChordDiagram').innerHTML = generateChordSVG(nextChord, 55);
+      document.getElementById('nextChordDiagram').innerHTML = generateChordSVG(nextChord, 75);
       document.getElementById('nextChordName').textContent = nextChord;
       
       // עדכון תצוגת סדרת האקורדים
