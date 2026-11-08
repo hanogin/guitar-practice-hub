@@ -3,21 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Guitar Practice Hub | תוכנית אימון גיטרה</title>
+  <title>Guitar Practice Studio | אימון גיטרה יומי</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&display=swap');
     body { font-family: 'Assistant', sans-serif; }
+    body.focus-active { overflow: hidden; }
+    .beat-pulse { animation: beatPulse 0.12s ease-out; }
+    @keyframes beatPulse { from { transform: scale(1.08); } to { transform: scale(1); } }
   </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen">
-  <div class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
+  <div id="homeView" class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
 
     <!-- Header & Cloud Connection Badge -->
     <header class="flex items-center justify-between border-b border-slate-700 pb-4">
       <div>
-        <h1 class="text-2xl sm:text-3xl font-extrabold text-amber-400">🎸 תוכנית אימון גיטרה</h1>
-        <p class="text-xs sm:text-sm text-slate-400">בנק תרגילים, יומן מעקב וסנכרון ענן (Netlify Blobs JSON)</p>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-amber-400">🎸 Guitar Practice Studio</h1>
+        <p class="text-xs sm:text-sm text-slate-400">בחר אימון → מסך פוקוס עם טיימר ומטרונום</p>
       </div>
       <div id="cloudStatus" class="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700">
         <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
@@ -25,46 +28,27 @@
       </div>
     </header>
 
-    <!-- Routine Timer & One-Minute Changes Section -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <!-- 30-Min Routine Blocks -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
-        <div class="flex items-center justify-between">
-          <h2 class="text-lg font-bold text-white">⏱️ רוטינת 30 דקות</h2>
-          <span id="timerDisplay" class="font-mono text-2xl text-amber-400">05:00</span>
-        </div>
-        <div class="grid grid-cols-3 gap-2">
-          <button onclick="setTimer(5, 'חימום ודיוק כרומטי')" class="p-2 text-xs bg-slate-700 hover:bg-slate-600 rounded text-center">1. חימום (5 דק')</button>
-          <button onclick="setTimer(5, 'מעברי אקורדים בדקה')" class="p-2 text-xs bg-slate-700 hover:bg-slate-600 rounded text-center">2. מעברים (5 דק')</button>
-          <button onclick="setTimer(5, 'קצב ופריטה חסומה')" class="p-2 text-xs bg-slate-700 hover:bg-slate-600 rounded text-center">3. קצב (5 דק')</button>
-          <button onclick="setTimer(10, 'פרויקט: שיר פעיל')" class="p-2 text-xs bg-slate-700 hover:bg-slate-600 rounded text-center col-span-2">4. שיר מטרה (10 דק')</button>
-          <button onclick="setTimer(5, 'נגינה חופשית / ג\'אם')" class="p-2 text-xs bg-slate-700 hover:bg-slate-600 rounded text-center">5. ג'אם (5 דק')</button>
-        </div>
-        <div class="flex gap-2">
-          <button id="timerBtn" onclick="toggleTimer()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 rounded text-sm transition">הפעל טיימר</button>
-          <button onclick="resetTimer()" class="px-4 bg-slate-700 hover:bg-slate-600 rounded text-sm">איפוס</button>
-        </div>
-        <div id="blockInfo" class="text-xs text-slate-400 text-center">בחר שלב להתחלת הטיימר</div>
+    <section class="bg-gradient-to-l from-amber-500/15 to-slate-800 border border-amber-500/40 rounded-xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div>
+        <h2 class="text-lg font-bold text-white">התחל לתרגל היום</h2>
+        <p class="text-xs text-slate-400 mt-1">אימון מודרך 30 דק׳ או תרגיל בודד מהבנק למטה.</p>
       </div>
+      <button type="button" onclick="startGuidedDaily()" class="shrink-0 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-6 py-3 rounded-lg text-sm transition">
+        ▶ אימון יומי (30 דק׳)
+      </button>
+    </section>
 
-      <!-- One-Minute Speed Changes Tap Counter -->
-      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 flex flex-col justify-between">
-        <div>
-          <h2 class="text-lg font-bold text-white mb-1">⚡ מונה מעברים בדקה</h2>
-          <p class="text-xs text-slate-400 mb-3">ספירת מעברים נקיים בזמן אמת (יעד מומלץ: 60+ מעברים).</p>
-          <div class="text-center py-2">
-            <span id="tapCountDisplay" class="font-mono text-5xl font-black text-amber-400">0</span>
-            <div class="text-xs text-slate-400 mt-1">מעברים שנספרו</div>
-          </div>
-        </div>
-        <div class="flex gap-2">
-          <button onclick="addTap()" class="flex-1 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold border border-amber-500/50 rounded-lg text-sm transition active:scale-95">
-            + מעבר מוצלח (Tap / מקש רווח)
-          </button>
-          <button onclick="resetTap()" class="px-3 bg-slate-700 hover:bg-slate-600 text-xs rounded">איפוס</button>
-        </div>
+    <section class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
+      <h2 class="text-sm font-bold text-slate-300">שלבי אימון יומי (30 דק׳)</h2>
+      <p class="text-xs text-slate-500">טיימר + מטרונום + טיפים במסך פוקוס. אפשר להתחיל מההתחלה או ממשלב בודד.</p>
+      <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+        <button type="button" onclick="startGuidedFromStep(0)" class="p-2 text-[11px] bg-slate-700 hover:bg-slate-600 rounded text-center">1 חימום</button>
+        <button type="button" onclick="startGuidedFromStep(1)" class="p-2 text-[11px] bg-slate-700 hover:bg-slate-600 rounded text-center">2 מעברים</button>
+        <button type="button" onclick="startGuidedFromStep(2)" class="p-2 text-[11px] bg-slate-700 hover:bg-slate-600 rounded text-center">3 קצב</button>
+        <button type="button" onclick="startGuidedFromStep(3)" class="p-2 text-[11px] bg-slate-700 hover:bg-slate-600 rounded text-center">4 שיר</button>
+        <button type="button" onclick="startGuidedFromStep(4)" class="p-2 text-[11px] bg-slate-700 hover:bg-slate-600 rounded text-center col-span-2 sm:col-span-1">5 ג׳אם</button>
       </div>
-    </div>
+    </section>
 
     <!-- Workout Builder: בנק תרגילים לבחירה יומית -->
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
@@ -101,9 +85,12 @@
       <div id="exerciseCategoriesContainer" class="space-y-4"></div>
     </div>
 
-    <!-- Practice Logger: טופס שמירת אימון -->
-    <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
-      <h2 class="text-lg font-bold text-white">📝 שמירת תוצאות אימון להיום</h2>
+    <details class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4 group">
+      <summary class="text-lg font-bold text-white cursor-pointer list-none flex items-center justify-between">
+        <span>📝 רישום ידני (אופציונלי)</span>
+        <span class="text-xs text-slate-500 group-open:hidden">לחץ לפתיחה</span>
+      </summary>
+      <p class="text-xs text-slate-500">רוב האימונים נשמרים אוטומטית ממסך הפוקוס. השתמש בזה רק לרישום חופשי.</p>
       <form onsubmit="saveSession(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-sm">
         <div>
           <label class="block text-xs text-slate-400 mb-1">צמד אקורדים:</label>
@@ -131,7 +118,7 @@
           </button>
         </div>
       </form>
-    </div>
+    </details>
 
     <!-- Practice History Table -->
     <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
@@ -158,6 +145,49 @@
 
   </div>
 
+  <!-- מסך פוקוס — אימון בודד או שלב ברוטינה -->
+  <div id="focusView" class="hidden fixed inset-0 z-50 bg-slate-950 flex flex-col">
+  <header class="flex items-center justify-between px-4 py-3 border-b border-slate-800 shrink-0">
+      <button type="button" onclick="exitFocus(true)" class="text-sm text-slate-400 hover:text-white">← יציאה</button>
+      <span id="focusModeBadge" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">אימון</span>
+      <span id="focusStepCounter" class="text-xs text-slate-500 w-16 text-left"></span>
+    </header>
+    <main class="flex-1 flex flex-col items-center justify-center px-4 pb-8 max-w-lg mx-auto w-full space-y-6">
+      <p id="focusCoach" class="text-sm text-amber-200/90 text-center leading-relaxed"></p>
+      <h2 id="focusTitle" class="text-2xl sm:text-3xl font-extrabold text-white text-center"></h2>
+      <p id="focusTarget" class="text-sm text-slate-400 text-center"></p>
+      <p id="focusTimerLabel" class="text-xs text-slate-500 uppercase tracking-wide">זמן נותר</p>
+      <div id="focusTimerWrap" class="text-center">
+        <span id="focusTimerDisplay" class="font-mono text-6xl sm:text-7xl font-black text-amber-400 tabular-nums">05:00</span>
+      </div>
+      <div id="focusChordPanel" class="hidden w-full bg-slate-900/80 border border-slate-700 rounded-xl p-4 text-center">
+        <p class="text-xs text-slate-400 mb-2">מעברים בדקה — הקש כשסיימת מעבר נקי (רווח)</p>
+        <span id="focusTapCount" class="font-mono text-5xl font-black text-amber-400">0</span>
+      </div>
+      <div class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-bold text-white">מטרונום</span>
+          <button type="button" id="metroToggleBtn" onclick="toggleFocusMetronome()" class="text-xs px-3 py-1.5 rounded bg-slate-700 hover:bg-slate-600">הפעל</button>
+        </div>
+        <div class="flex items-center justify-center gap-3">
+          <button type="button" onclick="adjustFocusBpm(-5)" class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-600 text-lg">−</button>
+          <span id="focusBpmDisplay" class="font-mono text-3xl text-amber-300 w-20 text-center">60</span>
+          <button type="button" onclick="adjustFocusBpm(5)" class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-600 text-lg">+</button>
+        </div>
+        <div id="focusBeatDots" class="flex justify-center gap-2 h-3">
+          <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+          <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+          <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+          <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+        </div>
+      </div>
+      <div class="flex gap-2 w-full">
+        <button type="button" id="focusTimerBtn" onclick="toggleFocusTimer()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg">השהה</button>
+        <button type="button" onclick="finishFocusEarly()" class="px-4 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-sm">סיום ✓</button>
+      </div>
+    </main>
+  </div>
+
   <script>
     const defaultData = {
       exercises: [
@@ -173,10 +203,321 @@
     };
 
     let appData = defaultData;
-    let timerInterval = null;
-    let timerRunning = false;
-    let secondsLeft = 300;
     let tapCount = 0;
+
+    const GUIDED_ROUTINE = [
+      { min: 5, label: "חימום ודיוק כרומטי", cat: "warmup_technique", title: "סולם כרומטי 1-2-3-4", bpm: 60 },
+      { min: 5, label: "מעברי אקורדים בדקה", cat: "chord_changes", title: "C ↔ G", bpm: 60 },
+      { min: 5, label: "קצב ופריטה חסומה", cat: "rhythm_strumming", title: "פריטת מטוטלת (D DU UDU)", bpm: 80 },
+      { min: 10, label: "פרויקט: שיר פעיל", cat: "songs", title: "שיר מטרה", bpm: 72 },
+      { min: 5, label: "נגינה חופשית / ג'אם", cat: "songs", title: "ג'אם חופשי", bpm: 70 }
+    ];
+
+    const COACH_BY_CAT = {
+      chord_changes: "החזק את יד האצבעות קרובה למיתרים. כל מעבר: עצור רגע רק אם יש צריפה — אחרת המשך בקצב המטרונום.",
+      warmup_technique: "נגן לאט ובשווי משקל. כל אצבע על הקצה הקרוב לפרט. אל תעצור את המטרונום.",
+      rhythm_strumming: "פריטה מעל השמנה. D = למטה, U = מעלה. שמור על פרק כף יד משוחרר.",
+      songs: "תחלק למקטעים של 4–8 תיבות. חזור על המקטע הרפה עד שהיד «זוכרת» לבד."
+    };
+
+    let focusSession = null;
+    let focusTimerInterval = null;
+    let focusTimerRunning = false;
+    let focusSecondsLeft = 0;
+    let focusTapCount = 0;
+    let audioCtx = null;
+    let metroTimer = null;
+    let metroBeat = 0;
+    let metroRunning = false;
+
+    function coachText(cat, title) {
+      const base = COACH_BY_CAT[cat] || "התמקד בנשימה וברצף. עדיף לאט ונקי מאשר מהיר ומלוכלך.";
+      return base + (title ? "" : "");
+    }
+
+    function parseBpmFromTarget(target) {
+      if (!target) return 60;
+      const m = String(target).match(/(\d+)\s*BPM/i) || String(target).match(/(\d+)\s*בדקה/);
+      if (m) return Math.min(220, Math.max(40, parseInt(m[1], 10)));
+      return 60;
+    }
+
+    function defaultMinutesForCat(cat) {
+      if (cat === "songs") return 10;
+      return 5;
+    }
+
+    function ensureAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") audioCtx.resume();
+    }
+
+    function playClick(accent) {
+      ensureAudio();
+      const t = audioCtx.currentTime;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.frequency.value = accent ? 1200 : 800;
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.exponentialRampToValueAtTime(accent ? 0.35 : 0.2, t + 0.002);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.07);
+    }
+
+    function updateBeatDots() {
+      const dots = document.querySelectorAll("#focusBeatDots span");
+      dots.forEach((d, i) => {
+        d.className = "w-2 h-2 rounded-full transition-colors " + (i === metroBeat % 4 ? "bg-amber-400 scale-125" : "bg-slate-600");
+      });
+      const wrap = document.getElementById("focusTimerWrap");
+      if (wrap && metroRunning) wrap.classList.add("beat-pulse");
+      setTimeout(() => wrap && wrap.classList.remove("beat-pulse"), 120);
+    }
+
+    function stopMetronome() {
+      metroRunning = false;
+      if (metroTimer) {
+        clearTimeout(metroTimer);
+        metroTimer = null;
+      }
+      const btn = document.getElementById("metroToggleBtn");
+      if (btn) btn.textContent = "הפעל";
+    }
+
+    function scheduleMetroTick() {
+      if (!metroRunning || !focusSession) return;
+      const bpm = focusSession.bpm || 60;
+      const interval = 60000 / bpm;
+      playClick(metroBeat % 4 === 0);
+      updateBeatDots();
+      metroBeat++;
+      metroTimer = setTimeout(scheduleMetroTick, interval);
+    }
+
+    function toggleFocusMetronome() {
+      const btn = document.getElementById("metroToggleBtn");
+      if (metroRunning) {
+        stopMetronome();
+        return;
+      }
+      ensureAudio();
+      metroRunning = true;
+      metroBeat = 0;
+      btn.textContent = "כבה";
+      scheduleMetroTick();
+    }
+
+    function adjustFocusBpm(delta) {
+      if (!focusSession) return;
+      focusSession.bpm = Math.min(220, Math.max(40, (focusSession.bpm || 60) + delta));
+      document.getElementById("focusBpmDisplay").textContent = focusSession.bpm;
+      if (metroRunning) {
+        stopMetronome();
+        toggleFocusMetronome();
+      }
+    }
+
+    function updateFocusTimerDisplay() {
+      const m = Math.floor(focusSecondsLeft / 60).toString().padStart(2, "0");
+      const s = (focusSecondsLeft % 60).toString().padStart(2, "0");
+      document.getElementById("focusTimerDisplay").textContent = `${m}:${s}`;
+    }
+
+    function showFocusUI() {
+      document.getElementById("homeView").classList.add("hidden");
+      document.getElementById("focusView").classList.remove("hidden");
+      document.body.classList.add("focus-active");
+    }
+
+    function hideFocusUI() {
+      document.getElementById("focusView").classList.add("hidden");
+      document.getElementById("homeView").classList.remove("hidden");
+      document.body.classList.remove("focus-active");
+    }
+
+    function beginFocusBlock(cfg) {
+      focusTapCount = 0;
+      focusSecondsLeft = cfg.minutes * 60;
+      focusSession = {
+        type: cfg.type,
+        cat: cfg.cat,
+        title: cfg.title,
+        target: cfg.target || "",
+        bpm: cfg.bpm || parseBpmFromTarget(cfg.target),
+        minutes: cfg.minutes,
+        guidedIndex: cfg.guidedIndex,
+        guidedTotal: cfg.guidedTotal
+      };
+
+      document.getElementById("focusTitle").textContent = cfg.title;
+      document.getElementById("focusTarget").textContent = cfg.target ? "יעד: " + cfg.target : "";
+      document.getElementById("focusCoach").textContent = coachText(cfg.cat, cfg.title);
+      document.getElementById("focusBpmDisplay").textContent = focusSession.bpm;
+      document.getElementById("focusTapCount").textContent = "0";
+      document.getElementById("focusChordPanel").classList.toggle("hidden", cfg.cat !== "chord_changes");
+      document.getElementById("focusModeBadge").textContent = cfg.type === "guided" ? "אימון יומי" : "תרגיל בודד";
+      const stepEl = document.getElementById("focusStepCounter");
+      if (cfg.type === "guided" && cfg.guidedTotal) {
+        stepEl.textContent = `${(cfg.guidedIndex || 0) + 1}/${cfg.guidedTotal}`;
+      } else {
+        stepEl.textContent = "";
+      }
+
+      stopMetronome();
+      updateFocusTimerDisplay();
+      showFocusUI();
+      startFocusTimerAuto();
+    }
+
+    function startFocusTimerAuto() {
+      clearInterval(focusTimerInterval);
+      focusTimerRunning = true;
+      document.getElementById("focusTimerBtn").textContent = "השהה";
+      focusTimerInterval = setInterval(() => {
+        if (focusSecondsLeft > 0) {
+          focusSecondsLeft--;
+          updateFocusTimerDisplay();
+        } else {
+          onFocusBlockComplete();
+        }
+      }, 1000);
+    }
+
+    function toggleFocusTimer() {
+      if (!focusSession) return;
+      if (focusTimerRunning) {
+        clearInterval(focusTimerInterval);
+        focusTimerRunning = false;
+        document.getElementById("focusTimerBtn").textContent = "המשך";
+        stopMetronome();
+      } else {
+        startFocusTimerAuto();
+      }
+    }
+
+    function onFocusBlockComplete() {
+      clearInterval(focusTimerInterval);
+      focusTimerRunning = false;
+      stopMetronome();
+      saveFocusSessionToHistory();
+      if (focusSession && focusSession.type === "guided") {
+        const next = (focusSession.guidedIndex || 0) + 1;
+        if (next < GUIDED_ROUTINE.length) {
+          const step = GUIDED_ROUTINE[next];
+          beginFocusBlock({
+            type: "guided",
+            cat: step.cat,
+            title: step.title,
+            target: step.label,
+            bpm: step.bpm,
+            minutes: step.min,
+            guidedIndex: next,
+            guidedTotal: GUIDED_ROUTINE.length
+          });
+          return;
+        }
+        alert("סיימת את אימון היום! 🎸 נשמר ביומן.");
+      } else {
+        alert("הזמן נגמר — תוצאה נשמרה ביומן.");
+      }
+      exitFocus(false);
+    }
+
+    function finishFocusEarly() {
+      if (!focusSession) return;
+      clearInterval(focusTimerInterval);
+      focusTimerRunning = false;
+      stopMetronome();
+      saveFocusSessionToHistory();
+      if (focusSession.type === "guided") {
+        const next = (focusSession.guidedIndex || 0) + 1;
+        if (next < GUIDED_ROUTINE.length && confirm("לעבור לשלב הבא באימון היומי?")) {
+          const step = GUIDED_ROUTINE[next];
+          beginFocusBlock({
+            type: "guided",
+            cat: step.cat,
+            title: step.title,
+            target: step.label,
+            bpm: step.bpm,
+            minutes: step.min,
+            guidedIndex: next,
+            guidedTotal: GUIDED_ROUTINE.length
+          });
+          return;
+        }
+      }
+      exitFocus(false);
+    }
+
+    function saveFocusSessionToHistory() {
+      if (!focusSession) return;
+      const date = new Date().toISOString().split("T")[0];
+      const row = {
+        date,
+        chords: focusSession.cat === "chord_changes" ? focusSession.title : "",
+        changes: focusSession.cat === "chord_changes" ? focusTapCount : 0,
+        bpm: focusSession.bpm,
+        song: focusSession.cat === "songs" ? focusSession.title : "",
+        notes: (focusSession.type === "guided" ? "[יומי] " : "") + (focusSession.target || focusSession.title)
+      };
+      appData.sessions.push(row);
+      renderHistory();
+      syncData();
+    }
+
+    function exitFocus(confirmAbort) {
+      if (confirmAbort && focusSession && !confirm("לצאת מהאימון? התקדמות בשלב הנוכחי לא תישמר אוטומטית.")) return;
+      clearInterval(focusTimerInterval);
+      focusTimerRunning = false;
+      stopMetronome();
+      focusSession = null;
+      hideFocusUI();
+    }
+
+    function startFocusPracticeById(id) {
+      const ex = appData.exercises.find((e) => e.id === id);
+      if (ex) startFocusPractice(ex);
+    }
+
+    function startFocusPractice(ex) {
+      const minutes = ex.durationMin || defaultMinutesForCat(ex.cat);
+      beginFocusBlock({
+        type: "single",
+        cat: ex.cat,
+        title: ex.title,
+        target: ex.target,
+        bpm: ex.defaultBpm || parseBpmFromTarget(ex.target),
+        minutes
+      });
+    }
+
+    function startGuidedDaily() {
+      startGuidedFromStep(0);
+    }
+
+    function startGuidedFromStep(index) {
+      const step = GUIDED_ROUTINE[index];
+      if (!step) return;
+      beginFocusBlock({
+        type: "guided",
+        cat: step.cat,
+        title: step.title,
+        target: step.label,
+        bpm: step.bpm,
+        minutes: step.min,
+        guidedIndex: index,
+        guidedTotal: GUIDED_ROUTINE.length
+      });
+    }
+
+    function focusAddTap() {
+      if (!focusSession || focusSession.cat !== "chord_changes") return;
+      focusTapCount++;
+      document.getElementById("focusTapCount").textContent = focusTapCount;
+    }
 
     async function initApp() {
       try {
@@ -261,7 +602,8 @@
                 <span class="text-slate-400 mr-2 text-[11px]">(${ex.target})</span>
               </div>
               <div class="flex items-center gap-2">
-                <button onclick="fillQuickPractice('${ex.title}', '${ex.cat}')" class="text-amber-400 hover:underline text-[11px]">בחר לאימון</button>
+                <button onclick="startFocusPracticeById('${ex.id}')" class="text-xs px-2 py-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded">▶ התחל</button>
+                <button onclick="fillQuickPractice('${ex.title}', '${ex.cat}')" class="text-slate-400 hover:underline text-[11px]">טופס</button>
                 <button onclick="deleteExercise('${ex.id}')" class="text-red-400 hover:underline">✕</button>
               </div>
             </div>
@@ -410,66 +752,16 @@
       syncData();
     }
 
-    function setTimer(minutes, label) {
-      clearInterval(timerInterval);
-      timerRunning = false;
-      secondsLeft = minutes * 60;
-      document.getElementById("blockInfo").textContent = "שלב נוכחי: " + label;
-      document.getElementById("timerBtn").textContent = "הפעל טיימר";
-      updateTimerDisplay();
-    }
-
-    function toggleTimer() {
-      if (timerRunning) {
-        clearInterval(timerInterval);
-        timerRunning = false;
-        document.getElementById("timerBtn").textContent = "המשך טיימר";
-      } else {
-        timerRunning = true;
-        document.getElementById("timerBtn").textContent = "השהה טיימר";
-        timerInterval = setInterval(() => {
-          if (secondsLeft > 0) {
-            secondsLeft--;
-            updateTimerDisplay();
-          } else {
-            clearInterval(timerInterval);
-            timerRunning = false;
-            alert("הזמן לחלק זה הסתיים!");
-            document.getElementById("timerBtn").textContent = "הפעל טיימר";
-          }
-        }, 1000);
-      }
-    }
-
-    function resetTimer() {
-      clearInterval(timerInterval);
-      timerRunning = false;
-      secondsLeft = 300;
-      updateTimerDisplay();
-      document.getElementById("timerBtn").textContent = "הפעל טיימר";
-    }
-
-    function updateTimerDisplay() {
-      const m = Math.floor(secondsLeft / 60).toString().padStart(2, "0");
-      const s = (secondsLeft % 60).toString().padStart(2, "0");
-      document.getElementById("timerDisplay").textContent = `${m}:${s}`;
-    }
-
-    function addTap() {
-      tapCount++;
-      document.getElementById("tapCountDisplay").textContent = tapCount;
-      document.getElementById("sessionChanges").value = tapCount;
-    }
-
     function resetTap() {
       tapCount = 0;
-      document.getElementById("tapCountDisplay").textContent = 0;
     }
 
     window.addEventListener("keydown", (e) => {
       if (e.code === "Space" && e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") {
         e.preventDefault();
-        addTap();
+        if (focusSession && !document.getElementById("focusView").classList.contains("hidden")) {
+          focusAddTap();
+        }
       }
     });
 
