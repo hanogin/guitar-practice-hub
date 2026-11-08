@@ -211,6 +211,14 @@
               <!-- נקודות פעימה יוכנסו כאן -->
             </div>
           </div>
+          
+          <!-- תצוגת כל האקורדים בסדרה -->
+          <div id="chordSequenceDisplay" class="mt-4 pt-3 border-t border-slate-700">
+            <p class="text-xs text-slate-500 mb-2 text-center">סדרת האקורדים:</p>
+            <div id="chordSequenceList" class="flex justify-center gap-2 flex-wrap">
+              <!-- רשימת האקורדים תוכנס כאן -->
+            </div>
+          </div>
         </div>
       </div>
       <div class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 space-y-3">
@@ -455,11 +463,12 @@
     }
 
     function parseChordsFromTitle(title) {
-      // מחלץ אקורדים מכותרת כמו "C ↔ G" או "Am ↔ F"
+      // מחלץ אקורדים מכותרת כמו "C ↔ G" או "Am ➔ Dm ➔ E ➔ Am"
       const chordPattern = /([A-G][#b]?m?7?)/g;
       const matches = title.match(chordPattern);
       if (matches && matches.length >= 2) {
-        return matches.slice(0, 2);
+        // מחזיר את כל האקורדים שנמצאו (לא רק 2)
+        return matches;
       }
       return null;
     }
@@ -489,6 +498,38 @@
       
       document.getElementById('nextChordDiagram').innerHTML = generateChordSVG(nextChord, 70);
       document.getElementById('nextChordName').textContent = nextChord;
+      
+      // עדכון תצוגת סדרת האקורדים
+      updateChordSequenceDisplay();
+    }
+    
+    function updateChordSequenceDisplay() {
+      const container = document.getElementById('chordSequenceList');
+      if (!container || !playAlongChords.length) return;
+      
+      let html = '';
+      playAlongChords.forEach((chord, index) => {
+        const isCurrent = index === currentChordIndex;
+        const isNext = index === (currentChordIndex + 1) % playAlongChords.length;
+        
+        html += `<span class="px-3 py-1 rounded-lg text-sm font-bold transition-all ${
+          isCurrent 
+            ? 'bg-amber-500 text-slate-900 scale-110' 
+            : isNext 
+              ? 'bg-slate-700 text-amber-400 border border-amber-500/50' 
+              : 'bg-slate-800 text-slate-400'
+        }">${chord}</span>`;
+        
+        // הוסף חץ בין אקורדים (לא אחרי האחרון)
+        if (index < playAlongChords.length - 1) {
+          html += `<span class="text-slate-600">➔</span>`;
+        }
+      });
+      
+      // הוסף חץ חוזר להתחלה
+      html += `<span class="text-slate-600">↩</span>`;
+      
+      container.innerHTML = html;
     }
 
     function updateBeatCounterDisplay() {
