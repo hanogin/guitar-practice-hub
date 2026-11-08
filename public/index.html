@@ -591,10 +591,10 @@
     }
 
     function parseBpmFromTarget(target) {
-      if (!target) return 60;
+      if (!target) return 110;
       const m = String(target).match(/(\d+)\s*BPM/i) || String(target).match(/(\d+)\s*בדקה/);
       if (m) return Math.min(220, Math.max(40, parseInt(m[1], 10)));
-      return 60;
+      return 110;
     }
 
     function defaultMinutesForCat(cat) {
