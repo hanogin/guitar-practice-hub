@@ -484,7 +484,7 @@
       console.log('playAlongChords set to:', playAlongChords);
       currentChordIndex = 0;
       currentBeatInChord = 0;
-      beatsPerChord = parseInt(document.getElementById('beatsPerChord')?.value || '8');
+      beatsPerChord = parseInt(document.getElementById('beatsPerChord')?.value || '4');
       playAlongActive = true;
       
       updateChordDisplay();
@@ -575,7 +575,7 @@
     }
 
     function updateBeatsPerChord() {
-      beatsPerChord = parseInt(document.getElementById('beatsPerChord')?.value || '8');
+      beatsPerChord = parseInt(document.getElementById('beatsPerChord')?.value || '4');
       currentBeatInChord = 0;
       updateBeatCounterDisplay();
     }
