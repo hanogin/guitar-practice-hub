@@ -146,33 +146,42 @@
   </div>
 
   <!-- מסך פוקוס — אימון בודד או שלב ברוטינה -->
-  <div id="focusView" class="hidden fixed inset-0 z-50 bg-slate-950 flex flex-col">
-  <header class="flex items-center justify-between px-4 py-3 border-b border-slate-800 shrink-0">
+  <div id="focusView" class="hidden fixed inset-0 z-50 bg-slate-950 overflow-y-auto">
+  <header class="sticky top-0 bg-slate-950/95 backdrop-blur flex items-center justify-between px-4 py-2 border-b border-slate-800 z-10">
       <button type="button" onclick="exitFocus(true)" class="text-sm text-slate-400 hover:text-white">← יציאה</button>
       <span id="focusModeBadge" class="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">אימון</span>
       <span id="focusStepCounter" class="text-xs text-slate-500 w-16 text-left"></span>
     </header>
-    <main class="flex-1 flex flex-col items-center justify-center px-4 pb-8 max-w-lg mx-auto w-full space-y-6">
-      <p id="focusCoach" class="text-sm text-amber-200/90 text-center leading-relaxed"></p>
-      <h2 id="focusTitle" class="text-2xl sm:text-3xl font-extrabold text-white text-center"></h2>
-      <p id="focusTarget" class="text-sm text-slate-400 text-center"></p>
-      <p id="focusTimerLabel" class="text-xs text-slate-500 uppercase tracking-wide">זמן נותר</p>
+    <main class="flex flex-col items-center px-4 py-3 max-w-lg mx-auto w-full space-y-3">
+      <p id="focusCoach" class="text-xs text-amber-200/90 text-center leading-relaxed"></p>
+      <h2 id="focusTitle" class="text-xl sm:text-2xl font-extrabold text-white text-center"></h2>
+      <p id="focusTarget" class="text-xs text-slate-400 text-center"></p>
+      
+      <!-- טיימר קומפקטי -->
       <div id="focusTimerWrap" class="text-center">
-        <span id="focusTimerDisplay" class="font-mono text-6xl sm:text-7xl font-black text-amber-400 tabular-nums">05:00</span>
+        <p id="focusTimerLabel" class="text-[10px] text-slate-500 uppercase tracking-wide mb-1">זמן נותר</p>
+        <span id="focusTimerDisplay" class="font-mono text-4xl sm:text-5xl font-black text-amber-400 tabular-nums">05:00</span>
       </div>
-      <div id="focusChordPanel" class="hidden w-full bg-slate-900/80 border border-slate-700 rounded-xl p-4 text-center">
-        <p class="text-xs text-slate-400 mb-2">מעברים בדקה — הקש כשסיימת מעבר נקי (רווח)</p>
-        <span id="focusTapCount" class="font-mono text-5xl font-black text-amber-400">0</span>
+      
+      <!-- כפתורי טיימר -->
+      <div class="flex gap-2 w-full">
+        <button type="button" id="focusTimerBtn" onclick="toggleFocusTimer()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 rounded-lg text-sm">השהה</button>
+        <button type="button" onclick="finishFocusEarly()" class="px-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 rounded-lg text-sm">סיום ✓</button>
+      </div>
+      
+      <div id="focusChordPanel" class="hidden w-full bg-slate-900/80 border border-slate-700 rounded-xl p-3 text-center">
+        <p class="text-xs text-slate-400 mb-1">מעברים בדקה — הקש רווח</p>
+        <span id="focusTapCount" class="font-mono text-4xl font-black text-amber-400">0</span>
       </div>
 
-      <!-- Play Along Panel - תרשימי אקורדים -->
-      <div id="playAlongPanel" class="hidden w-full space-y-4">
-        <div class="bg-slate-900/80 border border-amber-500/50 rounded-xl p-4">
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="text-sm font-bold text-amber-400">🎵 Play Along - מעברי אקורדים</h3>
-            <div class="flex items-center gap-2">
-              <label class="text-xs text-slate-400">פעימות למעבר:</label>
-              <select id="beatsPerChord" onchange="updateBeatsPerChord()" class="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-xs text-white">
+      <!-- Play Along Panel - תרשימי אקורדים (קומפקטי) -->
+      <div id="playAlongPanel" class="hidden w-full space-y-2">
+        <div class="bg-slate-900/80 border border-amber-500/50 rounded-xl p-3">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-xs font-bold text-amber-400">🎵 Play Along</h3>
+            <div class="flex items-center gap-1">
+              <label class="text-[10px] text-slate-400">פעימות:</label>
+              <select id="beatsPerChord" onchange="updateBeatsPerChord()" class="bg-slate-800 border border-slate-600 rounded px-1 py-0.5 text-[10px] text-white">
                 <option value="4">4</option>
                 <option value="8" selected>8</option>
                 <option value="16">16</option>
@@ -180,67 +189,60 @@
             </div>
           </div>
           
-          <!-- תצוגת אקורדים -->
-          <div class="flex items-center justify-center gap-8">
+          <!-- תצוגת אקורדים קומפקטית -->
+          <div class="flex items-center justify-center gap-4">
             <!-- אקורד נוכחי -->
             <div class="text-center">
-              <p class="text-xs text-slate-500 mb-1">עכשיו</p>
-              <div id="currentChordDiagram" class="bg-slate-800 rounded-lg p-3 border-2 border-amber-500">
-                <!-- SVG יוכנס כאן -->
+              <p class="text-[10px] text-slate-500 mb-1">עכשיו</p>
+              <div id="currentChordDiagram" class="bg-slate-800 rounded-lg p-2 border-2 border-amber-500">
               </div>
-              <p id="currentChordName" class="text-xl font-bold text-amber-400 mt-2">C</p>
+              <p id="currentChordName" class="text-lg font-bold text-amber-400 mt-1">C</p>
             </div>
             
-            <!-- חץ -->
-            <div class="text-3xl text-slate-600">→</div>
+            <div class="text-2xl text-slate-600">→</div>
             
             <!-- אקורד הבא -->
             <div class="text-center opacity-60">
-              <p class="text-xs text-slate-500 mb-1">הבא</p>
-              <div id="nextChordDiagram" class="bg-slate-800 rounded-lg p-3 border border-slate-600">
-                <!-- SVG יוכנס כאן -->
+              <p class="text-[10px] text-slate-500 mb-1">הבא</p>
+              <div id="nextChordDiagram" class="bg-slate-800 rounded-lg p-2 border border-slate-600">
               </div>
-              <p id="nextChordName" class="text-lg font-bold text-slate-400 mt-2">G</p>
+              <p id="nextChordName" class="text-base font-bold text-slate-400 mt-1">G</p>
             </div>
           </div>
           
           <!-- מונה פעימות -->
-          <div class="mt-4 flex justify-center items-center gap-2">
-            <span class="text-xs text-slate-400">פעימה:</span>
+          <div class="mt-2 flex justify-center items-center gap-1">
+            <span class="text-[10px] text-slate-400">פעימה:</span>
             <div id="beatCounter" class="flex gap-1">
-              <!-- נקודות פעימה יוכנסו כאן -->
             </div>
           </div>
           
           <!-- תצוגת כל האקורדים בסדרה -->
-          <div id="chordSequenceDisplay" class="mt-4 pt-3 border-t border-slate-700">
-            <p class="text-xs text-slate-500 mb-2 text-center">סדרת האקורדים:</p>
-            <div id="chordSequenceList" class="flex justify-center gap-2 flex-wrap">
-              <!-- רשימת האקורדים תוכנס כאן -->
+          <div id="chordSequenceDisplay" class="mt-2 pt-2 border-t border-slate-700">
+            <p class="text-[10px] text-slate-500 mb-1 text-center">סדרה:</p>
+            <div id="chordSequenceList" class="flex justify-center gap-1 flex-wrap">
             </div>
           </div>
         </div>
       </div>
-      <div class="w-full bg-slate-900 border border-slate-700 rounded-xl p-4 space-y-3">
+      
+      <!-- מטרונום קומפקטי -->
+      <div class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 space-y-2">
         <div class="flex items-center justify-between">
           <span class="text-sm font-bold text-white">מטרונום</span>
-          <button type="button" id="metroToggleBtn" onclick="toggleFocusMetronome()" class="text-xs px-3 py-1.5 rounded bg-slate-700 hover:bg-slate-600">הפעל</button>
+          <button type="button" id="metroToggleBtn" onclick="toggleFocusMetronome()" class="text-xs px-3 py-1 rounded bg-slate-700 hover:bg-slate-600">הפעל</button>
         </div>
-        <div class="flex items-center justify-center gap-3">
-          <button type="button" onclick="adjustFocusBpm(-5)" class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-600 text-lg">−</button>
-          <span id="focusBpmDisplay" class="font-mono text-3xl text-amber-300 w-20 text-center">60</span>
-          <button type="button" onclick="adjustFocusBpm(5)" class="w-10 h-10 rounded-lg bg-slate-800 border border-slate-600 text-lg">+</button>
+        <div class="flex items-center justify-center gap-2">
+          <button type="button" onclick="adjustFocusBpm(-5)" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-600 text-sm">−</button>
+          <span id="focusBpmDisplay" class="font-mono text-2xl text-amber-300 w-16 text-center">60</span>
+          <button type="button" onclick="adjustFocusBpm(5)" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-600 text-sm">+</button>
         </div>
-        <div id="focusBeatDots" class="flex justify-center gap-2 h-3">
+        <div id="focusBeatDots" class="flex justify-center gap-2 h-2">
           <span class="w-2 h-2 rounded-full bg-slate-600"></span>
           <span class="w-2 h-2 rounded-full bg-slate-600"></span>
           <span class="w-2 h-2 rounded-full bg-slate-600"></span>
           <span class="w-2 h-2 rounded-full bg-slate-600"></span>
         </div>
-      </div>
-      <div class="flex gap-2 w-full">
-        <button type="button" id="focusTimerBtn" onclick="toggleFocusTimer()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg">השהה</button>
-        <button type="button" onclick="finishFocusEarly()" class="px-4 bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg text-sm">סיום ✓</button>
       </div>
     </main>
   </div>
@@ -466,6 +468,7 @@
       // מחלץ אקורדים מכותרת כמו "C ↔ G" או "Am ➔ Dm ➔ E ➔ Am"
       const chordPattern = /([A-G][#b]?m?7?)/g;
       const matches = title.match(chordPattern);
+      console.log('parseChordsFromTitle:', title, '-> matches:', matches);
       if (matches && matches.length >= 2) {
         // מחזיר את כל האקורדים שנמצאו (לא רק 2)
         return matches;
@@ -474,9 +477,11 @@
     }
 
     function initPlayAlong(chords) {
+      console.log('initPlayAlong called with:', chords);
       if (!chords || chords.length < 2) return;
       
       playAlongChords = chords;
+      console.log('playAlongChords set to:', playAlongChords);
       currentChordIndex = 0;
       currentBeatInChord = 0;
       beatsPerChord = parseInt(document.getElementById('beatsPerChord')?.value || '8');
@@ -493,10 +498,10 @@
       const currentChord = playAlongChords[currentChordIndex];
       const nextChord = playAlongChords[(currentChordIndex + 1) % playAlongChords.length];
       
-      document.getElementById('currentChordDiagram').innerHTML = generateChordSVG(currentChord, 90);
+      document.getElementById('currentChordDiagram').innerHTML = generateChordSVG(currentChord, 70);
       document.getElementById('currentChordName').textContent = currentChord;
       
-      document.getElementById('nextChordDiagram').innerHTML = generateChordSVG(nextChord, 70);
+      document.getElementById('nextChordDiagram').innerHTML = generateChordSVG(nextChord, 55);
       document.getElementById('nextChordName').textContent = nextChord;
       
       // עדכון תצוגת סדרת האקורדים
