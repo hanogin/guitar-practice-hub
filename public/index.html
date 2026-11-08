@@ -72,7 +72,9 @@
         <h2 class="text-lg font-bold text-white">📋 בנק תרגילים (בחר מה לתרגל היום)</h2>
         <div class="flex gap-2">
           <button onclick="toggleExerciseModal()" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded">+ תרגיל חדש</button>
-          <button onclick="exportJson()" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1.5 rounded">ייצוא JSON</button>
+          <input type="file" id="jsonFileInput" accept=".json" class="hidden" onchange="handleFileImport(event)">
+          <button onclick="document.getElementById('jsonFileInput').click()" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1.5 rounded">ייבוא תרגילים (JSON)</button>
+          <button onclick="exportJson()" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1.5 rounded">ייצוא גיבוי</button>
         </div>
       </div>
 
@@ -335,6 +337,53 @@
       a.setAttribute("href", str);
       a.setAttribute("download", "guitar_practice_backup.json");
       a.click();
+    }
+
+    function handleFileImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const content = JSON.parse(e.target.result);
+          
+          // תמיכה גמישה: מערך ישיר או אובייקט עם exercises
+          let exercisesToImport = [];
+          if (Array.isArray(content)) {
+            exercisesToImport = content;
+          } else if (content && Array.isArray(content.exercises)) {
+            exercisesToImport = content.exercises;
+          } else {
+            alert("מבנה JSON לא תקין. נדרש מערך תרגילים או אובייקט עם מאפיין exercises.");
+            event.target.value = '';
+            return;
+          }
+
+          // הוספת מזהה ייחודי לתרגילים ללא id
+          const timestamp = Date.now();
+          exercisesToImport = exercisesToImport.map((ex, index) => ({
+            ...ex,
+            id: ex.id || `imp_${timestamp}_${index}`
+          }));
+
+          // מיזוג לבנק התרגילים הקיים
+          const countBefore = appData.exercises.length;
+          appData.exercises = [...appData.exercises, ...exercisesToImport];
+          const countAdded = appData.exercises.length - countBefore;
+
+          // רענון, סנכרון והודעה
+          renderExercises();
+          syncData();
+          event.target.value = '';
+          alert(`יובאו ${countAdded} תרגילים בהצלחה!`);
+
+        } catch (err) {
+          alert("שגיאה בקריאת קובץ JSON: " + err.message);
+          event.target.value = '';
+        }
+      };
+      reader.readAsText(file);
     }
 
     function saveSession(e) {
