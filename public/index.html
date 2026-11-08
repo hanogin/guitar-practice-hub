@@ -85,6 +85,15 @@
       <div id="exerciseCategoriesContainer" class="space-y-4"></div>
     </div>
 
+    <!-- Songbook: שירים עם YouTube ואקורדים -->
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-white">🎵 ספר שירים (Play Along עם YouTube)</h2>
+      </div>
+      <p class="text-xs text-slate-400">בחר שיר → צפה בסרטון + ראה אקורדים ודפוסי פריטה</p>
+      <div id="songbookContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3"></div>
+    </div>
+
     <details class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4 group">
       <summary class="text-lg font-bold text-white cursor-pointer list-none flex items-center justify-between">
         <span>📝 רישום ידני (אופציונלי)</span>
@@ -247,6 +256,70 @@
     </main>
   </div>
 
+  <!-- מסך שיר עם YouTube ואקורדים -->
+  <div id="songView" class="hidden fixed inset-0 z-50 bg-slate-950 overflow-y-auto">
+    <header class="sticky top-0 bg-slate-950/95 backdrop-blur flex items-center justify-between px-4 py-2 border-b border-slate-800 z-10">
+      <button type="button" onclick="exitSongView()" class="text-sm text-slate-400 hover:text-white">← חזרה</button>
+      <span class="text-[11px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">Play Along</span>
+      <span></span>
+    </header>
+    <main class="max-w-4xl mx-auto px-4 py-4 space-y-4">
+      <div class="text-center">
+        <h2 id="songTitle" class="text-xl font-bold text-white"></h2>
+        <p id="songArtist" class="text-sm text-slate-400"></p>
+      </div>
+      
+      <!-- YouTube Embed -->
+      <div class="aspect-video w-full bg-slate-900 rounded-xl overflow-hidden">
+        <iframe id="youtubeEmbed" class="w-full h-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      
+      <!-- Song Info -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div class="bg-slate-900 rounded-lg p-3 text-center">
+          <p class="text-[10px] text-slate-500 uppercase">BPM</p>
+          <p id="songBpm" class="text-2xl font-bold text-amber-400">68</p>
+        </div>
+        <div class="bg-slate-900 rounded-lg p-3 text-center">
+          <p class="text-[10px] text-slate-500 uppercase">דפוס פריטה</p>
+          <p id="songStrumming" class="text-lg font-mono text-white">D - D U</p>
+        </div>
+        <div class="bg-slate-900 rounded-lg p-3 text-center col-span-2 sm:col-span-1">
+          <p class="text-[10px] text-slate-500 uppercase">אקורדים</p>
+          <div id="songChordsList" class="flex flex-wrap justify-center gap-1 mt-1"></div>
+        </div>
+      </div>
+      
+      <!-- Chord Diagrams -->
+      <div class="bg-slate-900 rounded-xl p-4">
+        <h3 class="text-sm font-bold text-amber-400 mb-3">תרשימי אקורדים</h3>
+        <div id="songChordDiagrams" class="flex flex-wrap justify-center gap-4"></div>
+      </div>
+      
+      <!-- Song Sections -->
+      <div id="songSections" class="space-y-3"></div>
+      
+      <!-- Metronome -->
+      <div class="bg-slate-900 border border-slate-700 rounded-xl p-4">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-sm font-bold text-white">מטרונום</span>
+          <button type="button" id="songMetroBtn" onclick="toggleSongMetronome()" class="text-xs px-3 py-1 rounded bg-slate-700 hover:bg-slate-600">הפעל</button>
+        </div>
+        <div class="flex items-center justify-center gap-2">
+          <button type="button" onclick="adjustSongBpm(-5)" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-600 text-sm">−</button>
+          <span id="songMetroBpm" class="font-mono text-2xl text-amber-300 w-16 text-center">68</span>
+          <button type="button" onclick="adjustSongBpm(5)" class="w-8 h-8 rounded-lg bg-slate-800 border border-slate-600 text-sm">+</button>
+        </div>
+        <div id="songBeatDots" class="flex justify-center gap-2 mt-2">
+          <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+          <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+          <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+          <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+        </div>
+      </div>
+    </main>
+  </div>
+
   <script>
     const defaultData = {
       exercises: [
@@ -258,11 +331,82 @@
         { id: "6", cat: "rhythm_strumming", title: "פריטת מטוטלת (D DU UDU)", target: "80 BPM" },
         { id: "7", cat: "songs", title: "שיר פעיל: בית ראשון", target: "קצב מלא" }
       ],
-      sessions: []
+      sessions: [],
+      songbook: [
+        {
+          id: "song_1",
+          title: "Can't Help Falling in Love",
+          artist: "Elvis Presley",
+          youtubeId: "vGJTaP6anOU",
+          bpm: 68,
+          chords: ["C", "Em", "Am", "F", "G"],
+          strumming: "D - D U - U D U",
+          sections: [
+            { name: "Intro/Verse", progression: "C - Em - Am - F - C - G - C" },
+            { name: "Chorus", progression: "F - C - G - Am - F - C - G - C" }
+          ]
+        },
+        {
+          id: "song_2",
+          title: "Wonderwall",
+          artist: "Oasis",
+          youtubeId: "bx1Bh8ZvH84",
+          bpm: 87,
+          chords: ["Em", "G", "D", "A7sus4", "C"],
+          strumming: "D D U U D U",
+          sections: [
+            { name: "Verse", progression: "Em - G - D - A7sus4" },
+            { name: "Chorus", progression: "C - D - Em" }
+          ]
+        },
+        {
+          id: "song_3",
+          title: "Knockin' on Heaven's Door",
+          artist: "Bob Dylan",
+          youtubeId: "rm9coqlk8fY",
+          bpm: 69,
+          chords: ["G", "D", "Am", "C"],
+          strumming: "D - D U - U D U",
+          sections: [
+            { name: "Verse & Chorus", progression: "G - D - Am - Am - G - D - C - C" }
+          ]
+        },
+        {
+          id: "song_4",
+          title: "Horse With No Name",
+          artist: "America",
+          youtubeId: "zSAJ0l4OBHM",
+          bpm: 120,
+          chords: ["Em", "D6/9"],
+          strumming: "D - D U D U",
+          sections: [
+            { name: "Whole Song", progression: "Em - D6/9 (repeat)" }
+          ]
+        },
+        {
+          id: "song_5",
+          title: "Stand By Me",
+          artist: "Ben E. King",
+          youtubeId: "hwZNL7QVJjE",
+          bpm: 118,
+          chords: ["C", "Am", "F", "G"],
+          strumming: "D - D U - U D U",
+          sections: [
+            { name: "Verse & Chorus", progression: "C - C - Am - Am - F - G - C - C" }
+          ]
+        }
+      ]
     };
 
     let appData = defaultData;
     let tapCount = 0;
+    
+    // Song view state
+    let currentSong = null;
+    let songMetroRunning = false;
+    let songMetroTimer = null;
+    let songMetroBeat = 0;
+    let songBpm = 68;
 
     const GUIDED_ROUTINE = [
       { min: 5, label: "חימום ודיוק כרומטי", cat: "warmup_technique", title: "סולם כרומטי 1-2-3-4", bpm: 60 },
@@ -914,6 +1058,7 @@
       }
       renderExercises();
       renderHistory();
+      renderSongbook();
     }
 
     function loadLocalFallback() {
@@ -1014,6 +1159,138 @@
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    // ============ SONGBOOK FUNCTIONS ============
+    
+    function renderSongbook() {
+      const container = document.getElementById("songbookContainer");
+      if (!container) return;
+      
+      const songs = appData.songbook || defaultData.songbook || [];
+      container.innerHTML = "";
+      
+      songs.forEach(song => {
+        const card = document.createElement("div");
+        card.className = "bg-slate-900 border border-slate-700 rounded-lg p-3 hover:border-amber-500/50 transition cursor-pointer";
+        card.onclick = () => openSongView(song);
+        
+        card.innerHTML = `
+          <div class="flex items-start gap-3">
+            <img src="https://img.youtube.com/vi/${song.youtubeId}/mqdefault.jpg" class="w-20 h-14 object-cover rounded" alt="${song.title}">
+            <div class="flex-1 min-w-0">
+              <h3 class="font-bold text-white text-sm truncate">${song.title}</h3>
+              <p class="text-xs text-slate-400">${song.artist}</p>
+              <div class="flex gap-1 mt-1 flex-wrap">
+                ${song.chords.slice(0, 4).map(c => `<span class="text-[10px] px-1.5 py-0.5 bg-slate-800 rounded text-amber-400">${c}</span>`).join('')}
+                ${song.chords.length > 4 ? `<span class="text-[10px] text-slate-500">+${song.chords.length - 4}</span>` : ''}
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+    
+    function openSongView(song) {
+      currentSong = song;
+      songBpm = song.bpm || 68;
+      
+      // Update UI
+      document.getElementById("songTitle").textContent = song.title;
+      document.getElementById("songArtist").textContent = song.artist;
+      document.getElementById("youtubeEmbed").src = `https://www.youtube.com/embed/${song.youtubeId}`;
+      document.getElementById("songBpm").textContent = song.bpm;
+      document.getElementById("songStrumming").textContent = song.strumming || "D - D U";
+      document.getElementById("songMetroBpm").textContent = songBpm;
+      
+      // Chord list
+      const chordsList = document.getElementById("songChordsList");
+      chordsList.innerHTML = song.chords.map(c => 
+        `<span class="text-xs px-2 py-0.5 bg-amber-500/20 rounded text-amber-400 font-bold">${c}</span>`
+      ).join('');
+      
+      // Chord diagrams
+      const diagrams = document.getElementById("songChordDiagrams");
+      diagrams.innerHTML = song.chords.map(c => `
+        <div class="text-center">
+          ${generateChordSVG(c, 70)}
+          <p class="text-sm font-bold text-white mt-1">${c}</p>
+        </div>
+      `).join('');
+      
+      // Song sections
+      const sections = document.getElementById("songSections");
+      sections.innerHTML = (song.sections || []).map(sec => `
+        <div class="bg-slate-900 rounded-lg p-3">
+          <h4 class="text-xs font-bold text-amber-400 mb-1">${sec.name}</h4>
+          <p class="text-sm font-mono text-white">${sec.progression}</p>
+        </div>
+      `).join('');
+      
+      // Show view
+      document.getElementById("homeView").classList.add("hidden");
+      document.getElementById("songView").classList.remove("hidden");
+      document.body.classList.add("focus-active");
+    }
+    
+    function exitSongView() {
+      stopSongMetronome();
+      document.getElementById("youtubeEmbed").src = "";
+      document.getElementById("songView").classList.add("hidden");
+      document.getElementById("homeView").classList.remove("hidden");
+      document.body.classList.remove("focus-active");
+      currentSong = null;
+    }
+    
+    function toggleSongMetronome() {
+      if (songMetroRunning) {
+        stopSongMetronome();
+      } else {
+        startSongMetronome();
+      }
+    }
+    
+    function startSongMetronome() {
+      ensureAudio();
+      songMetroRunning = true;
+      songMetroBeat = 0;
+      document.getElementById("songMetroBtn").textContent = "כבה";
+      scheduleSongMetroTick();
+    }
+    
+    function stopSongMetronome() {
+      songMetroRunning = false;
+      if (songMetroTimer) {
+        clearTimeout(songMetroTimer);
+        songMetroTimer = null;
+      }
+      document.getElementById("songMetroBtn").textContent = "הפעל";
+    }
+    
+    function scheduleSongMetroTick() {
+      if (!songMetroRunning) return;
+      const interval = 60000 / songBpm;
+      playClick(songMetroBeat % 4 === 0);
+      updateSongBeatDots();
+      songMetroBeat++;
+      songMetroTimer = setTimeout(scheduleSongMetroTick, interval);
+    }
+    
+    function updateSongBeatDots() {
+      const dots = document.querySelectorAll("#songBeatDots span");
+      dots.forEach((d, i) => {
+        d.className = "w-2 h-2 rounded-full transition-colors " + (i === songMetroBeat % 4 ? "bg-amber-400 scale-125" : "bg-slate-600");
+      });
+    }
+    
+    function adjustSongBpm(delta) {
+      songBpm = Math.min(220, Math.max(40, songBpm + delta));
+      document.getElementById("songMetroBpm").textContent = songBpm;
+      if (songMetroRunning) {
+        stopSongMetronome();
+        startSongMetronome();
+      }
     }
 
     function fillQuickPractice(title, cat) {
