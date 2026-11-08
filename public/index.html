@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guitar Practice Hub | תוכנית אימון גיטרה</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&display=swap');
+    body { font-family: 'Assistant', sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen">
+  <div class="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
+
+    <!-- Header & Cloud Connection Badge -->
+    <header class="flex items-center justify-between border-b border-slate-700 pb-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-amber-400">🎸 תוכנית אימון גיטרה</h1>
+        <p class="text-xs sm:text-sm text-slate-400">בנק תרגילים, יומן מעקב וסנכרון ענן (Netlify Blobs JSON)</p>
+      </div>
+      <div id="cloudStatus" class="flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700">
+        <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+        <span>בודק חיבור ענן...</span>
+      </div>
+    </header>
+
+    <!-- Routine Timer & One-Minute Changes Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- 30-Min Routine Blocks -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
+        <div class="flex items-center justify-between">
+          <h2 class="text-lg font-bold text-white">⏱️ רוטינת 30 דקות</h2>
+          <span id="timerDisplay" class="font-mono text-2xl text-amber-400">05:00</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="setTimer(5, 'חימום ודיוק כרומטי')" class="p-2 text-xs bg-slate-700 hover:bg-slate-600 rounded text-center">1. חימום (5 דק')</button>
+          <button onclick="setTimer(5, 'מעברי אקורדים בדקה')" class="p-2 text-xs bg-slate-700 hover:bg-slate-600 rounded text-center">2. מעברים (5 דק')</button>
+          <button onclick="setTimer(5, 'קצב ופריטה חסומה')" class="p-2 text-xs bg-slate-700 hover:bg-slate-600 rounded text-center">3. קצב (5 דק')</button>
+          <button onclick="setTimer(10, 'פרויקט: שיר פעיל')" class="p-2 text-xs bg-slate-700 hover:bg-slate-600 rounded text-center col-span-2">4. שיר מטרה (10 דק')</button>
+          <button onclick="setTimer(5, 'נגינה חופשית / ג\'אם')" class="p-2 text-xs bg-slate-700 hover:bg-slate-600 rounded text-center">5. ג'אם (5 דק')</button>
+        </div>
+        <div class="flex gap-2">
+          <button id="timerBtn" onclick="toggleTimer()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 rounded text-sm transition">הפעל טיימר</button>
+          <button onclick="resetTimer()" class="px-4 bg-slate-700 hover:bg-slate-600 rounded text-sm">איפוס</button>
+        </div>
+        <div id="blockInfo" class="text-xs text-slate-400 text-center">בחר שלב להתחלת הטיימר</div>
+      </div>
+
+      <!-- One-Minute Speed Changes Tap Counter -->
+      <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 flex flex-col justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-white mb-1">⚡ מונה מעברים בדקה</h2>
+          <p class="text-xs text-slate-400 mb-3">ספירת מעברים נקיים בזמן אמת (יעד מומלץ: 60+ מעברים).</p>
+          <div class="text-center py-2">
+            <span id="tapCountDisplay" class="font-mono text-5xl font-black text-amber-400">0</span>
+            <div class="text-xs text-slate-400 mt-1">מעברים שנספרו</div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="addTap()" class="flex-1 py-3 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-bold border border-amber-500/50 rounded-lg text-sm transition active:scale-95">
+            + מעבר מוצלח (Tap / מקש רווח)
+          </button>
+          <button onclick="resetTap()" class="px-3 bg-slate-700 hover:bg-slate-600 text-xs rounded">איפוס</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workout Builder: בנק תרגילים לבחירה יומית -->
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h2 class="text-lg font-bold text-white">📋 בנק תרגילים (בחר מה לתרגל היום)</h2>
+        <div class="flex gap-2">
+          <button onclick="toggleExerciseModal()" class="text-xs bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded">+ תרגיל חדש</button>
+          <button onclick="exportJson()" class="text-xs bg-slate-700 hover:bg-slate-600 px-2 py-1.5 rounded">ייצוא JSON</button>
+        </div>
+      </div>
+
+      <!-- New Exercise Collapsible Box -->
+      <div id="exerciseFormBox" class="hidden bg-slate-900 p-4 rounded-lg border border-slate-700 space-y-3 text-sm">
+        <h3 class="font-bold text-amber-400 text-xs">הוספת תרגיל חדש לבנק ה-JSON</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <select id="newExCategory" class="bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white">
+            <option value="chord_changes">מעברי אקורדים</option>
+            <option value="warmup_technique">חימום וטכניקה</option>
+            <option value="rhythm_strumming">פריטה וקצב</option>
+            <option value="songs">שירים בפיתוח</option>
+          </select>
+          <input type="text" id="newExTitle" placeholder="שם התרגיל (למשל: C ↔ G)" class="bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white">
+          <input type="text" id="newExTarget" placeholder="יעד (למשל: 60 בדקה / 70 BPM)" class="bg-slate-800 border border-slate-700 rounded p-2 text-xs text-white">
+        </div>
+        <div class="flex justify-end gap-2">
+          <button onclick="toggleExerciseModal()" class="text-xs px-3 py-1 bg-slate-700 rounded">ביטול</button>
+          <button onclick="saveNewExercise()" class="text-xs px-4 py-1 bg-amber-500 font-bold text-slate-900 rounded">שמור תרגיל</button>
+        </div>
+      </div>
+
+      <!-- Categories Container -->
+      <div id="exerciseCategoriesContainer" class="space-y-4"></div>
+    </div>
+
+    <!-- Practice Logger: טופס שמירת אימון -->
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
+      <h2 class="text-lg font-bold text-white">📝 שמירת תוצאות אימון להיום</h2>
+      <form onsubmit="saveSession(event)" class="grid grid-cols-1 sm:grid-cols-4 gap-3 text-sm">
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">צמד אקורדים:</label>
+          <input type="text" id="sessionChords" placeholder="למשל: C ↔ G" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">מעברים בדקה:</label>
+          <input type="number" id="sessionChanges" placeholder="0" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">חימום (BPM):</label>
+          <input type="number" id="sessionBpm" value="60" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white">
+        </div>
+        <div>
+          <label class="block text-xs text-slate-400 mb-1">שיר / מקטע:</label>
+          <input type="text" id="sessionSong" placeholder="שם השיר" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white">
+        </div>
+        <div class="sm:col-span-3">
+          <label class="block text-xs text-slate-400 mb-1">הערות ודגשים להמשך:</label>
+          <input type="text" id="sessionNotes" placeholder="דגש על מעבר נקי ללא השהיות" class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-white">
+        </div>
+        <div class="flex items-end">
+          <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold p-2 rounded transition">
+            שמור אימון בענן
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Practice History Table -->
+    <div class="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
+      <h2 class="text-lg font-bold text-white">📊 היסטוריית אימונים אחרונים</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-right text-xs">
+          <thead class="bg-slate-900/60 text-slate-400">
+            <tr>
+              <th class="p-2">תאריך</th>
+              <th class="p-2">אקורדים</th>
+              <th class="p-2">מעברים/דקה</th>
+              <th class="p-2">BPM</th>
+              <th class="p-2">שיר</th>
+              <th class="p-2">הערות</th>
+              <th class="p-2">מחיקה</th>
+            </tr>
+          </thead>
+          <tbody id="historyTableBody" class="divide-y divide-slate-700">
+            <tr><td colspan="7" class="p-4 text-center text-slate-500">טוען נתונים...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const defaultData = {
+      exercises: [
+        { id: "1", cat: "chord_changes", title: "C ↔ G", target: "60 בדקה" },
+        { id: "2", cat: "chord_changes", title: "Am ↔ F", target: "40 בדקה" },
+        { id: "3", cat: "chord_changes", title: "D ↔ G", target: "60 בדקה" },
+        { id: "4", cat: "warmup_technique", title: "סולם כרומטי 1-2-3-4", target: "60 BPM" },
+        { id: "5", cat: "warmup_technique", title: "סולם דו מז'ור (C Major)", target: "65 BPM" },
+        { id: "6", cat: "rhythm_strumming", title: "פריטת מטוטלת (D DU UDU)", target: "80 BPM" },
+        { id: "7", cat: "songs", title: "שיר פעיל: בית ראשון", target: "קצב מלא" }
+      ],
+      sessions: []
+    };
+
+    let appData = defaultData;
+    let timerInterval = null;
+    let timerRunning = false;
+    let secondsLeft = 300;
+    let tapCount = 0;
+
+    async function initApp() {
+      try {
+        const res = await fetch("/api/data");
+        if (res.ok) {
+          const cloudData = await res.json();
+          if (cloudData && cloudData.exercises) {
+            appData = cloudData;
+          }
+          setCloudBadge(true, "מסונכרן עם Netlify Blobs");
+        } else {
+          loadLocalFallback();
+        }
+      } catch (e) {
+        loadLocalFallback();
+      }
+      renderExercises();
+      renderHistory();
+    }
+
+    function loadLocalFallback() {
+      const local = localStorage.getItem("guitar_app_data");
+      if (local) {
+        try { appData = JSON.parse(local); } catch(e) {}
+      }
+      setCloudBadge(false, "עבודה מקומית (Offline)");
+    }
+
+    async function syncData() {
+      localStorage.setItem("guitar_app_data", JSON.stringify(appData));
+      try {
+        const res = await fetch("/api/data", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(appData)
+        });
+        if (res.ok) {
+          setCloudBadge(true, "נשמר בענן בהצלחה");
+        }
+      } catch (e) {
+        setCloudBadge(false, "נשמר מקומית בלבד");
+      }
+    }
+
+    function setCloudBadge(isCloud, text) {
+      const el = document.getElementById("cloudStatus");
+      if (isCloud) {
+        el.className = "flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-emerald-950 border border-emerald-600 text-emerald-400";
+        el.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span><span>' + text + '</span>';
+      } else {
+        el.className = "flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-amber-950 border border-amber-600 text-amber-400";
+        el.innerHTML = '<span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span><span>' + text + '</span>';
+      }
+    }
+
+    function renderExercises() {
+      const container = document.getElementById("exerciseCategoriesContainer");
+      container.innerHTML = "";
+
+      const catLabels = {
+        chord_changes: "מעברי אקורדים בדקה",
+        warmup_technique: "חימום וטכניקה",
+        rhythm_strumming: "פריטה וקצב",
+        songs: "שירים בפיתוח"
+      };
+
+      Object.keys(catLabels).forEach(catKey => {
+        const items = appData.exercises.filter(x => x.cat === catKey);
+        if (items.length === 0) return;
+
+        const box = document.createElement("div");
+        box.className = "border border-slate-700/60 rounded-lg p-3 bg-slate-900/40";
+        
+        let html = `<h3 class="text-xs font-bold text-amber-400 mb-2">${catLabels[catKey]}</h3>`;
+        html += `<div class="grid grid-cols-1 sm:grid-cols-2 gap-2">`;
+        
+        items.forEach(ex => {
+          html += `
+            <div class="flex items-center justify-between p-2 bg-slate-800 rounded border border-slate-700 text-xs">
+              <div>
+                <span class="font-bold text-white">${ex.title}</span>
+                <span class="text-slate-400 mr-2 text-[11px]">(${ex.target})</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="fillQuickPractice('${ex.title}', '${ex.cat}')" class="text-amber-400 hover:underline text-[11px]">בחר לאימון</button>
+                <button onclick="deleteExercise('${ex.id}')" class="text-red-400 hover:underline">✕</button>
+              </div>
+            </div>
+          `;
+        });
+        html += `</div>`;
+        box.innerHTML = html;
+        container.appendChild(box);
+      });
+    }
+
+    function renderHistory() {
+      const tbody = document.getElementById("historyTableBody");
+      tbody.innerHTML = "";
+      if (appData.sessions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="p-4 text-center text-slate-500">אין עדיין אימונים שמורים.</td></tr>';
+        return;
+      }
+      appData.sessions.slice(-15).reverse().forEach((s, idx) => {
+        const tr = document.createElement("tr");
+        tr.className = "hover:bg-slate-700/40";
+        tr.innerHTML = `
+          <td class="p-2 text-slate-400">${s.date}</td>
+          <td class="p-2 font-bold text-amber-300">${s.chords || "-"}</td>
+          <td class="p-2 font-mono">${s.changes || 0}</td>
+          <td class="p-2">${s.bpm || "-"}</td>
+          <td class="p-2">${s.song || "-"}</td>
+          <td class="p-2 text-slate-300">${s.notes || "-"}</td>
+          <td class="p-2"><button onclick="deleteSession(${appData.sessions.length - 1 - idx})" class="text-red-400 hover:underline">✕</button></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function fillQuickPractice(title, cat) {
+      if (cat === "chord_changes") {
+        document.getElementById("sessionChords").value = title;
+      } else if (cat === "songs") {
+        document.getElementById("sessionSong").value = title;
+      } else {
+        document.getElementById("sessionNotes").value = "תרגול: " + title;
+      }
+    }
+
+    function toggleExerciseModal() {
+      document.getElementById("exerciseFormBox").classList.toggle("hidden");
+    }
+
+    function saveNewExercise() {
+      const cat = document.getElementById("newExCategory").value;
+      const title = document.getElementById("newExTitle").value.trim();
+      const target = document.getElementById("newExTarget").value.trim() || "-";
+      if (!title) return alert("נא להזין שם לתרגיל");
+
+      appData.exercises.push({ id: Date.now().toString(), cat, title, target });
+      document.getElementById("newExTitle").value = "";
+      document.getElementById("newExTarget").value = "";
+      toggleExerciseModal();
+      renderExercises();
+      syncData();
+    }
+
+    function deleteExercise(id) {
+      if (!confirm("למחוק תרגיל זה?")) return;
+      appData.exercises = appData.exercises.filter(x => x.id !== id);
+      renderExercises();
+      syncData();
+    }
+
+    function exportJson() {
+      const str = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+      const a = document.createElement("a");
+      a.setAttribute("href", str);
+      a.setAttribute("download", "guitar_practice_backup.json");
+      a.click();
+    }
+
+    function saveSession(e) {
+      e.preventDefault();
+      const chords = document.getElementById("sessionChords").value.trim();
+      const changes = parseInt(document.getElementById("sessionChanges").value) || 0;
+      const bpm = parseInt(document.getElementById("sessionBpm").value) || 60;
+      const song = document.getElementById("sessionSong").value.trim();
+      const notes = document.getElementById("sessionNotes").value.trim();
+      const date = new Date().toISOString().split("T")[0];
+
+      appData.sessions.push({ date, chords, changes, bpm, song, notes });
+      e.target.reset();
+      document.getElementById("sessionBpm").value = 60;
+      resetTap();
+      renderHistory();
+      syncData();
+    }
+
+    function deleteSession(index) {
+      if (!confirm("למחוק אימון זה מההיסטוריה?")) return;
+      appData.sessions.splice(index, 1);
+      renderHistory();
+      syncData();
+    }
+
+    function setTimer(minutes, label) {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      secondsLeft = minutes * 60;
+      document.getElementById("blockInfo").textContent = "שלב נוכחי: " + label;
+      document.getElementById("timerBtn").textContent = "הפעל טיימר";
+      updateTimerDisplay();
+    }
+
+    function toggleTimer() {
+      if (timerRunning) {
+        clearInterval(timerInterval);
+        timerRunning = false;
+        document.getElementById("timerBtn").textContent = "המשך טיימר";
+      } else {
+        timerRunning = true;
+        document.getElementById("timerBtn").textContent = "השהה טיימר";
+        timerInterval = setInterval(() => {
+          if (secondsLeft > 0) {
+            secondsLeft--;
+            updateTimerDisplay();
+          } else {
+            clearInterval(timerInterval);
+            timerRunning = false;
+            alert("הזמן לחלק זה הסתיים!");
+            document.getElementById("timerBtn").textContent = "הפעל טיימר";
+          }
+        }, 1000);
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timerRunning = false;
+      secondsLeft = 300;
+      updateTimerDisplay();
+      document.getElementById("timerBtn").textContent = "הפעל טיימר";
+    }
+
+    function updateTimerDisplay() {
+      const m = Math.floor(secondsLeft / 60).toString().padStart(2, "0");
+      const s = (secondsLeft % 60).toString().padStart(2, "0");
+      document.getElementById("timerDisplay").textContent = `${m}:${s}`;
+    }
+
+    function addTap() {
+      tapCount++;
+      document.getElementById("tapCountDisplay").textContent = tapCount;
+      document.getElementById("sessionChanges").value = tapCount;
+    }
+
+    function resetTap() {
+      tapCount = 0;
+      document.getElementById("tapCountDisplay").textContent = 0;
+    }
+
+    window.addEventListener("keydown", (e) => {
+      if (e.code === "Space" && e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA") {
+        e.preventDefault();
+        addTap();
+      }
+    });
+
+    initApp();
+  </script>
+</body>
+</html>

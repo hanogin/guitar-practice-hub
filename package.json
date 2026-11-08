@@ -1,0 +1,13 @@
+{
+  "name": "guitar-practice-hub",
+  "version": "1.0.0",
+  "description": "Guitar practice tracker and workout builder using Netlify Blobs JSON storage",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'No build required for static frontend'"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}
